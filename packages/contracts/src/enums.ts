@@ -1,0 +1,33 @@
+export enum UserRole {
+  SYSTEM_ADMIN = 'SYSTEM_ADMIN',
+  BUILDING_MANAGER = 'BUILDING_MANAGER',
+  EMPLOYEE = 'EMPLOYEE'
+}
+
+export enum ReservationStatus {
+  CONFIRMED = 'CONFIRMED',
+  CANCELLED = 'CANCELLED'
+}
+
+export enum DeskType {
+  STANDARD = 'STANDARD',
+  STANDING = 'STANDING',
+  QUIET = 'QUIET',
+  COLLABORATIVE = 'COLLABORATIVE',
+  ACCESSIBLE = 'ACCESSIBLE'
+}
+
+export enum DeskAvailabilityStatus {
+  AVAILABLE = 'AVAILABLE',
+  RESERVED = 'RESERVED',
+  RESERVED_BY_ME = 'RESERVED_BY_ME',
+  UNDER_REVIEW = 'UNDER_REVIEW',
+  MAINTENANCE = 'MAINTENANCE'
+}
+
+export enum AuthProviderType {
+  LOCAL = 'LOCAL',
+  OIDC = 'OIDC',
+  SAML = 'SAML'
+}
+

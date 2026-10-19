@@ -1,0 +1,31 @@
+{
+  "name": "seat-reservation-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Modular Monolith Workplace Seat Reservation System",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "dev:api": "npm run build --workspace=packages/contracts && npm run build --workspace=apps/api && npm run start:dev --workspace=apps/api",
+    "dev:web": "npm run dev --workspace=apps/web",
+    "db:up": "docker compose up -d postgres",
+    "db:down": "docker compose down",
+    "clean": "rimraf --glob \"apps/*/dist\" \"packages/*/dist\" \"apps/*/*.tsbuildinfo\" \"packages/*/*.tsbuildinfo\" node_modules \"apps/*/node_modules\" package-lock.json"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.9",
+    "typescript": "^5.5.4",
+    "rimraf": "^5.0.7",
+    "prettier": "^3.3.3"
+  },
+  "overrides": {
+    "braces": "^3.0.3",
+    "micromatch": "^4.0.8",
+    "ws": "^8.17.1"
+  }
+}

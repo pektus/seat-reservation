@@ -1,0 +1,46 @@
+[Unit]
+Description=SeatSpace Workplace Seat Reservation Backend API
+Documentation=https://internal.company.local/docs/seatspace
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=seatspace
+Group=seatspace
+
+WorkingDirectory=/var/www/seatspace/apps/api
+ExecStart=/usr/bin/node dist/main.js
+
+# Environment Configuration
+EnvironmentFile=/etc/seat-reservation/api.env
+Environment=NODE_ENV=production
+
+# Process lifecycle and recovery
+Restart=always
+RestartSec=5s
+KillMode=process
+TimeoutStopSec=30s
+
+# Resource limits
+LimitNOFILE=65536
+
+# Security Hardening & Sandboxing
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=true
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+RestrictRealtime=true
+
+# Standard Logging to Journald
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=seatspace-api
+
+[Install]
+WantedBy=multi-user.target
+
