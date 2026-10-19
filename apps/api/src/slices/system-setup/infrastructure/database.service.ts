@@ -21,18 +21,31 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
   }
 
   public async runPendingMigrations(): Promise<void> {
+    let applicationSchemaDetected = false;
     try {
       const pool = this.getPool();
       const client = await pool.connect();
       try {
-        // Only run if desks table exists
-        const tableCheck = await client.query(`
-          SELECT table_name FROM information_schema.tables 
-          WHERE table_schema = 'public' AND table_name = 'desks'
-        `);
+        const tableCheck = await client.query(
+          `SELECT table_name
+           FROM information_schema.tables
+           WHERE table_schema = 'public'
+             AND table_name = ANY($1::text[])`,
+          [[
+            'companies',
+            'buildings',
+            'floors',
+            'desks',
+            'users',
+            'roles',
+            'reservations',
+            'setup_metadata'
+          ]]
+        );
         if (tableCheck.rows.length === 0) {
           return;
         }
+        applicationSchemaDetected = true;
 
         await client.query('BEGIN');
 
@@ -113,8 +126,8 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
         client.release();
       }
     } catch (err: any) {
-      if (process.env.NODE_ENV === 'production') {
-        throw new Error(`CRITICAL: Database migration failed in production: ${err.message}`);
+      if (applicationSchemaDetected || process.env.NODE_ENV === 'production') {
+        throw new Error(`CRITICAL: Database migration failed: ${err.message}`);
       }
       this.logger.warn(`Database connection during startup migration check: ${err.message}`);
     }
@@ -436,4 +449,3 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     }
   }
 }
-

@@ -43,10 +43,21 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     // Verify token_version against current database state to enforce immediate revocation on role changes
     if (payload.tokenVersion !== undefined) {
-      const userRes = await this.databaseService.query(
-        'SELECT token_version, is_active FROM users WHERE id = $1',
-        [payload.sub]
-      );
+      let userRes;
+      try {
+        userRes = await this.databaseService.query(
+          'SELECT token_version, is_active FROM users WHERE id = $1',
+          [payload.sub]
+        );
+      } catch (err) {
+        if ((err as { code?: string }).code === '42P01') {
+          throw new UnauthorizedException(
+            'The application database is not initialized or this session is no longer valid. Complete setup or sign in again.'
+          );
+        }
+        throw err;
+      }
+
       if (userRes.rows.length === 0 || !userRes.rows[0].is_active) {
         throw new UnauthorizedException('User account has been deactivated or removed');
       }
@@ -69,4 +80,3 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     };
   }
 }
-
